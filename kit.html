@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free First-Week Kit — Life Dashboard</title>
+<meta name="description" content="Set up your Life Dashboard in 7 days, 3 minutes a day. Free 7-day guide, 120 example goals and the Sunday 15 weekly reset.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1f2a30; --muted:#5f6b73; --line:#e3e8ec; --bg:#fbfaf7; --brand:#2e7d6b; --brand-dark:#1f5c4f; --brand-soft:#e3f1ec; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; font-size:17px; }
+  img { max-width:100%; height:auto; display:block; }
+  .wrap { max-width:1020px; margin:0 auto; padding:48px 20px 72px; }
+  .grid { display:grid; grid-template-columns:1.05fr .95fr; gap:48px; align-items:start; }
+  @media (max-width:860px) { .grid { grid-template-columns:1fr; gap:28px; } }
+  .eyebrow { font-size:.8rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--brand); }
+  h1 { font-family:Fraunces, Georgia, serif; font-size:clamp(2rem,4.4vw,3rem); line-height:1.1; margin:.3em 0 .4em; }
+  .lead { color:var(--muted); font-size:1.1rem; }
+  ul.get { list-style:none; padding:0; margin:22px 0; }
+  ul.get li { padding:10px 0 10px 36px; position:relative; border-bottom:1px dashed var(--line); }
+  ul.get li::before { content:"✓"; position:absolute; left:2px; top:10px; width:24px; height:24px; border-radius:7px; background:var(--brand); color:#fff; font-size:.8rem; font-weight:700; display:grid; place-items:center; }
+  .card { background:#fff; border:2px solid var(--brand); border-radius:18px; padding:28px; box-shadow:0 18px 50px rgba(46,125,107,.13); }
+  .card h2 { font-family:Fraunces, Georgia, serif; margin:0 0 6px; font-size:1.5rem; }
+  label { display:block; font-weight:600; font-size:.92rem; margin:14px 0 6px; }
+  input[type=text], input[type=email] { width:100%; padding:13px 14px; border:1px solid #cfd6dc; border-radius:10px; font:inherit; }
+  input:focus { outline:2px solid var(--brand); border-color:transparent; }
+  .consent { display:flex; gap:10px; align-items:flex-start; font-size:.9rem; color:var(--ink); margin:16px 0 4px; font-weight:400; }
+  .consent input { margin-top:4px; width:18px; height:18px; flex:none; }
+  .btn { display:block; width:100%; margin-top:18px; background:var(--brand); color:#fff; border:0; border-radius:999px; padding:15px; font:inherit; font-weight:700; cursor:pointer; }
+  .btn:hover { background:var(--brand-dark); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+  .small { font-size:.82rem; color:var(--muted); margin-top:12px; }
+  .shot { margin-top:26px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:8px; }
+  .closed { display:none; background:var(--brand-soft); border-radius:12px; padding:16px; margin-top:14px; font-size:.95rem; }
+  .is-closed form { display:none; } .is-closed .closed { display:block; }
+  footer { text-align:center; font-size:.85rem; color:var(--muted); padding-bottom:40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="grid">
+    <div>
+      <div class="eyebrow">Free for Life Dashboard owners</div>
+      <h1>Set up your dashboard in 7 days — 3 minutes a day.</h1>
+      <p class="lead">Most planners are abandoned in the first week, right after one big, exhausting setup session. This kit does the opposite: one small step a day, straight to your inbox.</p>
+      <ul class="get">
+        <li><b>The 7-day guide</b> (PDF) — one 3-minute step a day, with screenshots</li>
+        <li><b>The Goal Library</b> — 120 ready-to-paste example goals across all 8 life areas</li>
+        <li><b>The Sunday 15</b> — a 15-minute weekly reset that keeps the dashboard alive</li>
+        <li><b>7 short daily emails</b> so you never have to remember what's next</li>
+      </ul>
+      <p class="small">Your dashboard works fully without this — the kit just makes the first week easier.</p>
+      <div class="shot"><img src="img/dashboard-areas.webp" width="1800" height="600" alt="Life-area progress rings from the dashboard"></div>
+    </div>
+
+    <div class="card" id="signup">
+      <h2>Send me the kit</h2>
+      <p class="small" style="margin-top:0">Free. Takes 10 seconds.</p>
+      <!-- MailerLite: set ML_ACTION below to your form's action URL (Forms ▸ Embedded form ▸ HTML code, the <form action="...">). -->
+      <form id="kitform" method="post" target="_self">
+        <label for="name">First name</label>
+        <input id="name" type="text" name="fields[name]" autocomplete="given-name">
+        <label for="email">Email</label>
+        <input id="email" type="email" name="fields[email]" required autocomplete="email">
+        <label class="consent"><input id="consent" type="checkbox" required>
+          <span>Yes, email me the First-Week Kit, plus tips, template updates and offers from Life Dashboard — including news about Telverge, our life-management app. I can unsubscribe at any time. See the <a href="privacy.html">Privacy Notice</a>.</span></label>
+        <input type="hidden" name="ml-submit" value="1">
+        <input type="hidden" name="anticsrf" value="true">
+        <input type="hidden" name="fields[source]" id="src" value="">
+        <button class="btn" type="submit">Email me the kit</button>
+        <p class="small">You'll get a confirmation email first — click the link in it and the kit arrives straight away.</p>
+      </form>
+      <div class="closed">Sign-ups open very soon. Please check back in a day or two.</div>
+    </div>
+  </div>
+</div>
+<footer><a href="index.html">Life Dashboard</a> · <a href="privacy.html">Privacy</a></footer>
+<script>
+  // ============ EDIT ============
+  const ML_ACTION = "";   // e.g. "https://assets.mailerlite.com/jsonp/123456/forms/987654321/subscribe"
+  const THANKS_URL = "kit-thanks.html";
+  // ==============================
+  const form = document.getElementById("kitform");
+  document.getElementById("src").value = new URLSearchParams(location.search).get("src") || "direct";
+  if (!ML_ACTION) {
+    document.getElementById("signup").classList.add("is-closed");
+  } else {
+    form.action = ML_ACTION;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector("button"); btn.disabled = true; btn.textContent = "Sending…";
+      try {
+        await fetch(ML_ACTION, { method: "POST", body: new FormData(form), mode: "no-cors" });
+        location.href = THANKS_URL;
+      } catch (err) {
+        btn.disabled = false; btn.textContent = "Email me the kit";
+        alert("Sorry — that didn't go through. Please try again.");
+      }
+    });
+  }
+</script>
+</body>
+</html>

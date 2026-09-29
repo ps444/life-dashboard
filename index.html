@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RBGM Life Dashboard — see your whole life on one page</title>
+<meta name="description" content="An Excel & Google Sheets life dashboard built on the Role-Based Goals Matrix. Goals, habits, weekly planner and quarterly reviews across the 8 areas of your life. One-off payment.">
+<meta property="og:title" content="RBGM Life Dashboard">
+<meta property="og:description" content="Your to-do list only sees your job. This sees your whole life.">
+<meta property="og:image" content="img/dashboard-hero.webp">
+<meta property="og:type" content="product">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='12' fill='none' stroke='%23d9e9e3' stroke-width='6'/><path d='M16 4a12 12 0 0 1 11.4 15.7' fill='none' stroke='%232e7d6b' stroke-width='6'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1f2a30; --muted: #5f6b73; --line: #e3e8ec; --bg: #fbfaf7; --card: #ffffff;
+    --brand: #2e7d6b; --brand-dark: #1f5c4f; --brand-soft: #e3f1ec; --accent: #f2a93b;
+    --a1:#5aa469; --a2:#3d85c6; --a3:#e0a800; --a4:#d9534f; --a5:#8e7cc3; --a6:#e69138; --a7:#45818e; --a8:#c27ba0;
+    --radius: 14px; --max: 1120px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); line-height: 1.6; font-size: 17px; }
+  img { max-width: 100%; height: auto; display: block; }
+  figure { margin: 0; }
+  h1, h2, h3, p, li { overflow-wrap: break-word; }
+  a { color: var(--brand-dark); }
+  h1, h2, h3 { font-family: Fraunces, Georgia, serif; line-height: 1.15; margin: 0 0 .5em; letter-spacing: -.01em; }
+  h1 { font-size: clamp(2.1rem, 5vw, 3.5rem); }
+  h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+  h3 { font-size: 1.35rem; }
+  p { margin: 0 0 1em; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+  section { padding: 72px 0; }
+  .eyebrow { font-size: .8rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--brand); margin-bottom: 10px; }
+
+  /* nav */
+  .nav { position: sticky; top: 0; z-index: 10; background: rgba(251,250,247,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; text-decoration: none; color: var(--ink); }
+  .logo svg { width: 26px; height: 26px; }
+  .nav-links { display: flex; gap: 22px; align-items: center; }
+  .nav-links a { text-decoration: none; color: var(--muted); font-weight: 500; font-size: .95rem; }
+  @media (max-width: 720px) { .nav-links a:not(.btn) { display: none; } section { padding: 52px 0; } .hero { padding-top: 40px; } }
+  @media (max-width: 420px) { .btn.small { padding: 8px 12px; font-size: .82rem; } .logo span { font-size: .92rem; } }
+
+  /* buttons */
+  .btn { display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #fff !important; text-decoration: none; font-weight: 700; padding: 15px 26px; border-radius: 999px; box-shadow: 0 6px 18px rgba(46,125,107,.28); transition: transform .15s, background .15s; border: 0; cursor: pointer; font-size: 1.02rem; }
+  .btn:hover { background: var(--brand-dark); transform: translateY(-1px); }
+  .btn.small { padding: 9px 18px; font-size: .9rem; box-shadow: none; }
+  .btn.ghost { background: transparent; color: var(--brand-dark) !important; border: 2px solid var(--brand); box-shadow: none; }
+  .price-note { font-size: .9rem; color: var(--muted); margin-top: 12px; }
+  .price-note s { opacity: .7; }
+
+  /* hero */
+  .hero { padding: 64px 0 40px; text-align: center; background: radial-gradient(1000px 420px at 50% -80px, var(--brand-soft), transparent); }
+  .hero p.sub { font-size: 1.15rem; color: var(--muted); max-width: 720px; margin: 0 auto 28px; }
+  .hero .shot { margin-top: 44px; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 22px; }
+  .chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: .88rem; font-weight: 500; }
+  .chip b { color: var(--brand); }
+
+  .shot { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; box-shadow: 0 18px 50px rgba(31,42,48,.10); }
+  .shot a { display: block; cursor: zoom-in; }
+  .shot img { border-radius: 8px; }
+  figcaption { font-size: .85rem; color: var(--muted); text-align: center; margin-top: 10px; }
+
+  /* problem */
+  .narrow { max-width: 720px; margin: 0 auto; }
+  .problem { background: var(--card); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .pull { font-family: Fraunces, Georgia, serif; font-size: 1.5rem; color: var(--brand-dark); margin: 1.2em 0; }
+
+  /* roles */
+  .areas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 26px 0 36px; }
+  .area { border-radius: 12px; padding: 14px 16px; font-weight: 600; color: #fff; font-size: .95rem; }
+  @media (max-width: 720px) { .areas { grid-template-columns: repeat(2, 1fr); } }
+
+  /* features */
+  .feature { display: grid; grid-template-columns: 5fr 7fr; gap: 44px; align-items: center; padding: 38px 0; }
+  .feature.flip { grid-template-columns: 7fr 5fr; }
+  .feature.flip .copy { order: 2; }
+  .feature ul { padding-left: 1.1em; margin: 0; }
+  .feature li { margin-bottom: 6px; }
+  .tag { display: inline-block; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; color: #fff; margin-bottom: 12px; }
+  @media (max-width: 860px) { .feature, .feature.flip { grid-template-columns: 1fr; gap: 20px; } .feature.flip .copy { order: 0; } }
+
+  /* fit */
+  .fit { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; }
+  .card h3 { margin-bottom: 14px; }
+  .card ul { margin: 0; padding-left: 1.1em; }
+  .card li { margin-bottom: 8px; }
+  .yes h3 { color: var(--brand-dark); }
+  .no h3 { color: #9a4b3f; }
+  @media (max-width: 760px) { .fit { grid-template-columns: 1fr; } }
+
+  /* pricing */
+  .pricing { background: linear-gradient(180deg, var(--brand-soft), var(--bg)); }
+  .offer { max-width: 620px; margin: 0 auto; text-align: center; background: var(--card); border: 2px solid var(--brand); border-radius: 20px; padding: 40px 32px; box-shadow: 0 20px 60px rgba(46,125,107,.15); }
+  .offer .price { font-family: Fraunces, Georgia, serif; font-size: 3.4rem; font-weight: 700; color: var(--brand-dark); line-height: 1; margin: 8px 0; }
+  .offer .price small { font-size: 1.3rem; color: var(--muted); font-family: Inter, sans-serif; font-weight: 500; }
+  .offer ul { text-align: left; list-style: none; padding: 0; margin: 26px 0; }
+  .offer li { padding: 9px 0 9px 34px; border-bottom: 1px dashed var(--line); position: relative; }
+  .offer li::before { content: "✓"; position: absolute; left: 4px; top: 8px; width: 22px; height: 22px; border-radius: 6px; background: var(--brand); color: #fff; font-size: .8rem; font-weight: 700; display: grid; place-items: center; }
+  .alt-pay { margin-top: 16px; font-size: .92rem; color: var(--muted); }
+
+  /* faq */
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 22px; margin-bottom: 12px; }
+  summary { font-weight: 600; cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-size: 1.4rem; line-height: 1; color: var(--brand); }
+  details[open] summary::after { content: "–"; }
+  details p { margin: 12px 0 0; color: var(--muted); }
+
+  .final { text-align: center; }
+  footer { border-top: 1px solid var(--line); padding: 36px 0 60px; color: var(--muted); font-size: .9rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between; }
+
+  .preview-ribbon { display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: #1f2a30; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: .85rem; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+  .is-preview .preview-ribbon { display: block; }
+</style>
+</head>
+<body>
+
+<!--
+  ================= EDIT BEFORE LAUNCH =================
+  All the things you need to change live in SITE (in the <script> at the bottom):
+  checkout links, prices, launch end date, contact email.
+  Until CHECKOUT_URL is set, a "Preview" ribbon shows and Buy buttons scroll to pricing.
+  ======================================================
+-->
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="logo" href="#top">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="#d9e9e3" stroke-width="6"/><path d="M16 4a12 12 0 0 1 11.4 15.7" fill="none" stroke="#2e7d6b" stroke-width="6"/></svg>
+      <span data-name>RBGM Life Dashboard</span>
+    </a>
+    <div class="nav-links">
+      <a href="#inside">What's inside</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn small buy" href="#pricing">Get it — <span data-price>£14</span></a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow">Built on the RBGM method · Role-Based Goals Matrix</div>
+    <h1>Your to-do list only sees your job.<br>This sees your whole life.</h1>
+    <p class="sub">A spreadsheet life dashboard for Excel and Google Sheets. Put your goals and habits under the 8 areas of your life, from health and money to family and fun, and one visual dashboard shows how each one is really doing. Set up in 10 minutes. No apps, no subscription.</p>
+    <a class="btn buy" href="#pricing">Get the dashboard — <span data-price>£14</span></a>
+    <div class="price-note"><span data-launch-note>Launch price, then <span data-regular>£24</span>.</span> One-off payment · instant download.</div>
+    <div class="chips">
+      <span class="chip"><b>✓</b> Excel · Windows &amp; Mac</span>
+      <span class="chip"><b>✓</b> Google Sheets edition</span>
+      <span class="chip"><b>✓</b> 16 live charts</span>
+      <span class="chip"><b>✓</b> No macros</span>
+      <span class="chip"><b>✓</b> Pay once, reuse every year</span>
+    </div>
+    <figure class="shot">
+      <a href="img/dashboard-hero.webp" target="_blank" rel="noopener"><img src="img/dashboard-hero.webp" width="1800" height="778" alt="The dashboard: six headline cards, a goals-completed doughnut, progress by life area and goal status charts"></a>
+    </figure>
+  </div>
+</header>
+
+<section class="problem">
+  <div class="wrap narrow">
+    <div class="eyebrow">The problem</div>
+    <h2>Busy isn't the same as balanced</h2>
+    <p>You're not short on effort. You get up, get through the list, fall into bed. But at the end of the month something nags at you: the gym you meant to get back to, the friend you haven't rung, the savings goal you set in January and haven't looked at since.</p>
+    <p class="pull">That's not a willpower problem. It's a visibility problem.</p>
+    <p>Most planners are built around tasks, and most of your tasks come from work. So the loudest part of your life gets all the space on the page, and the quiet parts slip without anyone noticing — including you.</p>
+    <p>Maybe you've tried to fix it already: a Notion setup that took a weekend to build and a week to abandon, a habit app you stopped opening. You don't need a more complicated system. You need to <em>see</em> your whole life in one place.</p>
+  </div>
+</section>
+
+<section id="method">
+  <div class="wrap">
+    <div class="narrow" style="text-align:center">
+      <div class="eyebrow">The RBGM method</div>
+      <h2>Plan by the roles you play, not the tasks you have</h2>
+      <p>You're not just "someone with a to-do list". You're a professional, a parent or partner, a friend — someone with a body to look after, money to manage and, ideally, some fun to have. Choose 8 areas of your life and name them however suits you. Every goal and habit belongs to one of them, and the dashboard tracks each area on its own.</p>
+    </div>
+    <div class="areas" aria-label="Example life areas">
+      <div class="area" style="background:var(--a1)">Health &amp; Fitness</div>
+      <div class="area" style="background:var(--a2)">Career</div>
+      <div class="area" style="background:var(--a3)">Finances</div>
+      <div class="area" style="background:var(--a4)">Family</div>
+      <div class="area" style="background:var(--a5)">Relationships</div>
+      <div class="area" style="background:var(--a6)">Personal Growth</div>
+      <div class="area" style="background:var(--a7)">Fun &amp; Adventure</div>
+      <div class="area" style="background:var(--a8)">Home</div>
+    </div>
+    <figure class="shot">
+      <a href="img/dashboard-areas.webp" target="_blank" rel="noopener"><img src="img/dashboard-areas.webp" loading="lazy" width="1800" height="600" alt="Eight progress rings, one per life area"></a>
+      <figcaption>Instead of a vague sense of being behind: Health is strong, Personal Growth needs attention.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="inside" style="background:var(--card);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="narrow" style="text-align:center">
+      <div class="eyebrow">What's inside</div>
+      <h2>20 tabs. Everything connected. Nothing to build.</h2>
+      <p>You type goals, habits and tasks. Every chart, ring, bar and streak updates by itself.</p>
+    </div>
+
+    <div class="feature">
+      <div class="copy">
+        <span class="tag" style="background:var(--brand)">Dashboard</span>
+        <h3>Your whole life on one screen</h3>
+        <ul>
+          <li>6 headline cards: goals completed, average progress, habits this month and year-to-date, best streak, days left</li>
+          <li>Progress by life area, plus a ring for every area</li>
+          <li>Habit consistency by month and success rate per habit</li>
+          <li>Life-balance radar, open priorities and this week's tasks</li>
+          <li>Your next deadlines, with overdue goals flagged</li>
+        </ul>
+      </div>
+      <figure class="shot"><a href="img/dashboard-habits.webp" target="_blank" rel="noopener"><img src="img/dashboard-habits.webp" loading="lazy" width="1800" height="939" alt="Dashboard habit charts, priorities doughnut, life balance radar and weekly tasks"></a></figure>
+    </div>
+
+    <div class="feature flip">
+      <div class="copy">
+        <span class="tag" style="background:var(--a2)">Goals</span>
+        <h3>Up to 100 goals, each with a home</h3>
+        <p>Pick a life area, write how you'll measure it, add dates and say whether it's urgent and important. The sheet then:</p>
+        <ul>
+          <li>works out its priority (Do First, Schedule, Delegate, Eliminate)</li>
+          <li>draws a progress bar</li>
+          <li>sets the status: Done, In progress, Not started or Overdue</li>
+          <li>assigns the quarter</li>
+        </ul>
+      </div>
+      <figure class="shot"><a href="img/goals.webp" target="_blank" rel="noopener"><img src="img/goals.webp" loading="lazy" width="1800" height="898" alt="Goals table colour-coded by life area with priority, progress bars and status"></a></figure>
+    </div>
+
+    <div class="feature">
+      <div class="copy">
+        <span class="tag" style="background:var(--a4)">Priorities</span>
+        <h3>Your Eisenhower matrix, filled in for you</h3>
+        <p>Every open goal lands in the right box automatically, with a chart showing where your attention is going. If everything is "urgent", you'll see it.</p>
+      </div>
+      <figure class="shot"><a href="img/priorities.webp" target="_blank" rel="noopener"><img src="img/priorities.webp" loading="lazy" width="1800" height="930" alt="Eisenhower matrix with Do First, Schedule, Delegate and Eliminate quadrants"></a></figure>
+    </div>
+
+    <div class="feature flip">
+      <div class="copy">
+        <span class="tag" style="background:var(--a5)">Weekly Planner</span>
+        <h3>Seven colour-coded days</h3>
+        <p>Type any date and the week lays itself out. Up to 15 tasks a day; tick them and they're struck through. Every day has its own progress bar, and three charts show how the week is going.</p>
+      </div>
+      <figure class="shot"><a href="img/weekly.webp" target="_blank" rel="noopener"><img src="img/weekly.webp" loading="lazy" width="1800" height="639" alt="Weekly planner with seven coloured day columns, progress bars and charts"></a></figure>
+    </div>
+
+    <div class="feature">
+      <div class="copy">
+        <span class="tag" style="background:var(--a6)">Habit Tracker</span>
+        <h3>One tab for every month</h3>
+        <ul>
+          <li>12 habits, every day of the month</li>
+          <li>Daily completion chart and monthly completion ring</li>
+          <li>Score against your own target for each habit</li>
+          <li>Current and best streaks that carry across months</li>
+          <li>A daily mood tracker with its own chart</li>
+        </ul>
+      </div>
+      <figure class="shot"><a href="img/habits.webp" target="_blank" rel="noopener"><img src="img/habits.webp" loading="lazy" width="1800" height="1066" alt="Monthly habit tracker grid with ticks, daily completion chart, streaks and mood tracker"></a></figure>
+    </div>
+
+    <div class="feature flip">
+      <div class="copy">
+        <span class="tag" style="background:var(--a7)">Calendar</span>
+        <h3>The year at a glance — any year</h3>
+        <p>Monday or Sunday start. Goal deadlines, your key dates and today are highlighted, so nothing sneaks up on you.</p>
+      </div>
+      <figure class="shot"><a href="img/calendar.webp" target="_blank" rel="noopener"><img src="img/calendar.webp" loading="lazy" width="1800" height="976" alt="Twelve-month calendar with deadlines and key dates highlighted"></a></figure>
+    </div>
+
+    <div class="feature">
+      <div class="copy">
+        <span class="tag" style="background:var(--a8)">Quarterly Review</span>
+        <h3>The 10-minute reset</h3>
+        <p>Every three months, score each life area from 1 to 10. The scores draw a radar chart, so you can see the shape of your life change through the year. Short reset questions help you decide what changes next quarter, plus an annual review.</p>
+      </div>
+      <figure class="shot"><a href="img/review.webp" target="_blank" rel="noopener"><img src="img/review.webp" loading="lazy" width="1800" height="1023" alt="Quarterly review scores with a life-balance radar chart"></a></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap fit">
+    <div class="card yes">
+      <h3>This is for you if…</h3>
+      <ul>
+        <li>You're busy and capable, but some parts of life keep getting squeezed out</li>
+        <li>You've tried Notion or planning apps and gave up on the setup or upkeep</li>
+        <li>You love seeing progress: rings, bars, streaks, things turning green</li>
+        <li>You'd rather pay once than pay monthly</li>
+      </ul>
+    </div>
+    <div class="card no">
+      <h3>It probably isn't if…</h3>
+      <ul>
+        <li>You want a shared family or team planner that syncs between people</li>
+        <li>You need reminders and notifications — it's a spreadsheet, it works when you open it</li>
+        <li>You mainly plan on your phone</li>
+        <li>You'd prefer a printable paper planner</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <div class="offer">
+      <div class="eyebrow">Everything included</div>
+      <h2 style="margin-bottom:0" data-name>RBGM Life Dashboard</h2>
+      <div class="price"><span data-price>£14</span> <small data-launch-small>launch price</small></div>
+      <div class="price-note" data-launch-note-2>Then <span data-regular>£24</span>. One-off payment — no subscription.</div>
+      <ul>
+        <li>Excel edition — Windows &amp; Mac, any recent version incl. one-off Office</li>
+        <li>Microsoft 365 edition with native checkboxes</li>
+        <li>Google Sheets edition (instant "Make a copy" link)</li>
+        <li>A filled example file and a blank file for your year</li>
+        <li>Reusable every year — change the year in Settings</li>
+        <li>10-minute Start Here guide built in</li>
+      </ul>
+      <a class="btn buy" href="#pricing">Get the dashboard — <span data-price>£14</span></a>
+      <div class="price-note">Secure checkout. Instant download.</div>
+      <div class="alt-pay" data-selar-row>Paying in Naira? <a data-selar href="#">Buy with Naira on Selar →</a></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap narrow">
+    <div class="eyebrow">FAQ</div>
+    <h2>Questions</h2>
+    <details><summary>Does it work on a Mac?</summary><p>Yes — in Excel for Mac as well as Windows. It uses formulas only (no macros), so there's nothing to enable and no security warnings. It doesn't work in Apple Numbers.</p></details>
+    <details><summary>Does it work in Google Sheets?</summary><p>Yes. You get a Google Sheets edition as a "Make a copy" link — one click puts your own private copy in your Google Drive.</p></details>
+    <details><summary>Which version of Excel do I need?</summary><p>Any recent desktop version of Excel, including one-off purchases like Office 2019, 2021 and 2024, as well as Microsoft 365. Microsoft 365 users can also use the bonus edition with native checkboxes.</p></details>
+    <details><summary>Is there a subscription?</summary><p>No. You pay once and the files are yours. Reuse them every year by changing the year in Settings.</p></details>
+    <details><summary>I'm not great with spreadsheets. Will I cope?</summary><p>You won't write a formula or build a chart. You type goals, habits and tasks; the sheet does the rest. The Start Here tab takes about 10 minutes, and the example file shows what it looks like in use.</p></details>
+    <details><summary>Can I change the life areas and habits?</summary><p>Yes. Rename all 8 life areas and all 12 habits in Settings and the whole file updates to match.</p></details>
+    <details><summary>Can I use it on my phone?</summary><p>It's designed for a computer, where the dashboard has room to breathe. It isn't designed or tested for phones.</p></details>
+    <details><summary>What's your refund policy?</summary><p>It's an instant digital download, so sales are generally final. But if it doesn't open or work as described on your version of Excel or Google Sheets, email <a data-email href="#">us</a> within 14 days and we'll fix it or refund you.</p></details>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap narrow">
+    <h2>Your whole life deserves more than a to-do list</h2>
+    <p>Ten minutes to set up. One screen to see how every part of your life is really doing. One payment, and it's yours every year.</p>
+    <a class="btn buy" href="#pricing">Get the dashboard — <span data-price>£14</span></a>
+    <div class="price-note">Excel for Windows &amp; Mac · Google Sheets · instant download</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <strong data-name>RBGM Life Dashboard</strong> is built on the RBGM method (Role-Based Goals Matrix).<br>
+      We're also building <strong>Telverge</strong>, a life-management app based on the same idea — tick the updates box at checkout if you'd like to hear when it's ready.
+    </div>
+    <div>
+      <a data-email href="#">Contact</a> · <a href="privacy.html">Privacy</a> · © <span id="yr"></span>
+    </div>
+  </div>
+</footer>
+
+<div class="preview-ribbon">Preview — checkout not connected yet</div>
+
+<script>
+  // ============ EDIT THESE ============
+  const SITE = {
+    NAME: "RBGM Life Dashboard",
+    PRICE: "£14",
+    REGULAR_PRICE: "£24",            // set equal to PRICE to hide the launch-price wording
+    LAUNCH_ENDS: "",                 // e.g. "31 October" — shown as "Launch price until 31 October"
+    CHECKOUT_URL: "",                // your Payhip product link, e.g. https://payhip.com/b/XXXX
+    SELAR_URL: "",                   // your Selar product link (Naira); leave blank to hide the line
+    EMAIL: "hello@example.com"       // your support email
+  };
+  // ====================================
+  document.querySelectorAll("[data-name]").forEach(e => e.textContent = SITE.NAME);
+  document.querySelectorAll("[data-price]").forEach(e => e.textContent = SITE.PRICE);
+  document.querySelectorAll("[data-regular]").forEach(e => e.textContent = SITE.REGULAR_PRICE);
+  const onLaunch = SITE.REGULAR_PRICE && SITE.REGULAR_PRICE !== SITE.PRICE;
+  document.querySelectorAll("[data-launch-note]").forEach(e => {
+    e.innerHTML = onLaunch ? `Launch price${SITE.LAUNCH_ENDS ? " until " + SITE.LAUNCH_ENDS : ""}, then ${SITE.REGULAR_PRICE}.` : "";
+  });
+  document.querySelectorAll("[data-launch-note-2]").forEach(e => {
+    e.textContent = onLaunch ? `Then ${SITE.REGULAR_PRICE}. One-off payment — no subscription.` : "One-off payment — no subscription.";
+  });
+  document.querySelectorAll("[data-launch-small]").forEach(e => { if (!onLaunch) e.remove(); });
+  document.querySelectorAll("[data-email]").forEach(e => { e.href = "mailto:" + SITE.EMAIL; });
+  if (SITE.CHECKOUT_URL) {
+    document.querySelectorAll("a.buy").forEach(a => { a.href = SITE.CHECKOUT_URL; a.rel = "noopener"; });
+  } else {
+    document.body.classList.add("is-preview");
+  }
+  if (SITE.SELAR_URL) {
+    document.querySelectorAll("[data-selar]").forEach(a => a.href = SITE.SELAR_URL);
+  } else {
+    document.querySelectorAll("[data-selar-row]").forEach(e => e.remove());
+  }
+  document.getElementById("yr").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
